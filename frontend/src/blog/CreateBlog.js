@@ -1,7 +1,7 @@
 import { supabase } from '../supabaseClient'
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import './Blog.css'
 
 const CompCreateBlog = () => {
 
@@ -17,25 +17,37 @@ const CompCreateBlog = () => {
     }
 
     return (
-        <div>
-            <h3>Create Blog</h3>
-            <form onSubmit={store}>
-                <div className="bm-3">
-                    <label className="form-label">title</label>
-                    <input value={title}
-                    onChange={ (e) => setTitle(e.target.value)}
-                    type="text"
-                    className="form-control"></input>
+        <div className='blog-container'>
+            <div className='form-card'>
+                <div className='form-header'>
+                    <h3>Crear Nuevo Blog</h3>
                 </div>
-                <div className="bm-3">
-                    <label className="form-label">content</label>
-                    <textarea value={content}
-                    onChange={ (e) => setContent(e.target.value)}
-                    type="text"
-                    className="form-control"></textarea>
-                </div>
-                <button type="submit" className="btn btn-primary">Create</button>
-            </form>
+                <form onSubmit={store}>
+                    <div className="mb-3">
+                        <label className="form-label">Título</label>
+                        <input 
+                            value={title}
+                            onChange={ (e) => setTitle(e.target.value)}
+                            type="text"
+                            className="form-control-styled"
+                            placeholder='Ingresa el título'
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Contenido</label>
+                        <textarea 
+                            value={content}
+                            onChange={ (e) => setContent(e.target.value)}
+                            type="text"
+                            className="form-control-styled"
+                            rows="5"
+                            placeholder='Escribe aquí tu contenido...'
+                        />
+                    </div>
+                    <button type="submit" className="btn-save">Guardar</button>
+                    <button type="button" onClick={() => navigate('/')} className="btn-save" style={{marginTop: '10px', background: '#ccc'}}>Cancelar</button>
+                </form>
+            </div>
         </div>
     )
 }

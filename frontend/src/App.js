@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient'; 
 import Login from './auth/login';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css'; 
 
 // Importamos tus componentes del Blog
 import CompShowBlogs from './blog/ShowBlog';
@@ -28,7 +29,7 @@ function AppContent() {
     return () => subscription?.unsubscribe();
   }, []);
 
-  if (loading) return <div>Cargando sistema...</div>;
+  if (loading) return <div className="loading-screen">Cargando sistema...</div>;
 
   // SI NO HAY SESIÓN -> MUESTRA LOGIN
   if (!session) {
@@ -38,24 +39,33 @@ function AppContent() {
   // SI HAY SESIÓN -> MUESTRA LA APP Y RUTAS
   return (
     <div className="App">
-       {/* Barra de navegación simple */}
-       <nav style={{padding: '10px', background: '#f8f9fa', marginBottom: '20px'}}>
-          <span>Bienvenido: {session.user.email}</span>
-          <button 
-            onClick={() => supabase.auth.signOut()} 
-            className="btn btn-danger btn-sm" 
-            style={{marginLeft: '15px'}}
-          >
-            Cerrar Sesión
-          </button>
+       {/* Barra de navegación moderna */}
+       <nav className="navbar">
+          <div className="navbar-brand">
+            Mi Blog Personal
+          </div>
+          <div className="navbar-user">
+            <span className="user-email">
+              <i className="fas fa-user-circle"></i>
+              {session.user.email}
+            </span>
+            <button 
+              onClick={() => supabase.auth.signOut()} 
+              className="btn-logout"
+            >
+              <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+          </div>
        </nav>
        
-       {/* AQUÍ VAN TUS RUTAS ORIGINALES */}
-       <Routes>
-           <Route path='/' element={ <CompShowBlogs /> } />
-           <Route path='/create' element={ <CompCreateBlog /> } />
-           <Route path='/edit/:id' element={ <CompEditBlog /> } />
-       </Routes>
+       {/* Contenido principal */}
+       <main>
+        <Routes>
+            <Route path='/' element={ <CompShowBlogs /> } />
+            <Route path='/create' element={ <CompCreateBlog /> } />
+            <Route path='/edit/:id' element={ <CompEditBlog /> } />
+        </Routes>
+       </main>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { supabase } from '../supabaseClient'; // Importamos la conexión directa
+import { supabase } from '../supabaseClient';
+import './Login.css'; // Importamos los estilos modernos
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -10,38 +11,65 @@ const Login = () => {
     e.preventDefault();
     setErrorMsg('');
 
-    // --- MAGIA: Login directo sin backend intermedio ---
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      setErrorMsg('Error: Credenciales incorrectas');
+      setErrorMsg('Credenciales incorrectas. Inténtalo de nuevo.');
       console.error('Login error:', error);
     } else {
-      // Login exitoso
       console.log("Login exitoso, usuario:", data.user.email);
-      
-      // Esperamos un poco para que Supabase actualice la sesión
-      // y el listener onAuthStateChange se dispare en App.js
-      setTimeout(async () => {
-        const { data: sessionData } = await supabase.auth.getSession();
-        console.log("Sesión verificada:", sessionData);
-      }, 100);
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Iniciar Sesión (Directo)</h2>
-      {errorMsg && <p style={{color:'red'}}>{errorMsg}</p>}
-      
-      <form onSubmit={handleLogin}>
-        <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" required />
-        <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" required />
-        <button type="submit">Entrar</button>
-      </form>
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-header">
+          <h2>Bienvenido</h2>
+          <p>Ingresa tus credenciales para continuar</p>
+        </div>
+        
+        {errorMsg && (
+          <div className="error-message">
+            <span>{errorMsg}</span>
+          </div>
+        )}
+        
+        <form onSubmit={handleLogin}>
+          <div className="form-group">
+            <label htmlFor="email">Correo Electrónico</label>
+            <input 
+              id="email"
+              type="email" 
+              className="form-control-styled"
+              value={email} 
+              onChange={e=>setEmail(e.target.value)} 
+              placeholder="ejemplo@correo.com" 
+              required 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="password">Contraseña</label>
+            <input 
+              id="password"
+              type="password" 
+              className="form-control-styled"
+              value={password} 
+              onChange={e=>setPassword(e.target.value)} 
+              placeholder="••••••••" 
+              required 
+            />
+          </div>
+          
+          <button type="submit" className="btn-login">
+            Iniciar Sesión
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
