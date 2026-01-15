@@ -29,6 +29,8 @@ const CompShowBlogs = () => {
             <div className='row'>
                 <div className='col'>
                     <Link to="/create" className='btn btn-primary mt-2 mb-2'><i className="fas fa-plus"></i></Link>
+                    <a href="/logout">Cerrar Sesión</a>
+
                     <table className='table'>
                         <thead className='table-primary'>
                             <tr>
