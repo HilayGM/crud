@@ -1,55 +1,70 @@
 import { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { supabase } from './supabaseClient'; 
+import Login from './auth/login';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-// Importamos componentes
-import Login from './auth/login'; // <--- Revisa que esta ruta coincida con tus carpetas
+// Importamos tus componentes del Blog
 import CompShowBlogs from './blog/ShowBlog';
 import CompCreateBlog from './blog/CreateBlog';
 import CompEditBlog from './blog/EditBlog';
 
-// Router
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-
-function App() {
-  const [token, setToken] = useState(null);
+function AppContent() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Intentar recuperar el token si recargas la página
-    const savedToken = localStorage.getItem('token');
-    if (savedToken) {
-      setToken(savedToken);
-    }
+    // Verificar sesión inicial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // Escuchar cambios (login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    return () => subscription?.unsubscribe();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-  };
+  if (loading) return <div>Cargando sistema...</div>;
 
-  // --- LÓGICA DE PROTECCIÓN (AQUÍ ESTÁ LA SOLUCIÓN) ---
-  if (!token) {
-    // ERROR ANTERIOR: Probablemente tenías solo <Login />
-    // CORRECCIÓN: Debes pasarle la función setToken así:
-    return <Login setToken={setToken} />; 
+  // SI NO HAY SESIÓN -> MUESTRA LOGIN
+  if (!session) {
+    return <Login />
   }
 
-  // Si hay token, mostramos la App completa
+  // SI HAY SESIÓN -> MUESTRA LA APP Y RUTAS
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <button onClick={handleLogout} className="btn-logout">Cerrar Sesión</button>
-      </header>
-      
-      <BrowserRouter>
-        <Routes>
-            <Route path='/' element={ <CompShowBlogs /> } />
-            <Route path='/create' element={ <CompCreateBlog /> } />
-            <Route path='/edit/:id' element={ <CompEditBlog /> } />
-        </Routes>
-      </BrowserRouter>
+       {/* Barra de navegación simple */}
+       <nav style={{padding: '10px', background: '#f8f9fa', marginBottom: '20px'}}>
+          <span>Bienvenido: {session.user.email}</span>
+          <button 
+            onClick={() => supabase.auth.signOut()} 
+            className="btn btn-danger btn-sm" 
+            style={{marginLeft: '15px'}}
+          >
+            Cerrar Sesión
+          </button>
+       </nav>
+       
+       {/* AQUÍ VAN TUS RUTAS ORIGINALES */}
+       <Routes>
+           <Route path='/' element={ <CompShowBlogs /> } />
+           <Route path='/create' element={ <CompCreateBlog /> } />
+           <Route path='/edit/:id' element={ <CompEditBlog /> } />
+       </Routes>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 

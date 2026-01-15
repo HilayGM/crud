@@ -1,10 +1,6 @@
-import axios from "axios";
+import { supabase } from '../supabaseClient'
 import React, { useState , useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-const URI = 'http://localhost:8000/blogs/'
-
-
 
 const CompEditBlog = () => {
     const [title, setTitle] =  useState('')
@@ -14,19 +10,22 @@ const CompEditBlog = () => {
     const {id} = useParams()
     const update = async (e) => {
         e.preventDefault()
-        await axios.put(URI + id, {
+        await supabase.from('blogs').update({
             title: title, 
-            content: content})
-                navigate('/')
+            content: content
+        }).eq('id', id)
+        navigate('/')
     }
     useEffect(()=>{
         getBlogById()
     }, [])
 
     const getBlogById = async () => {
-    const res =     await  axios.get(URI + id)
-    setTitle(res.data.title)
-    setContent(res.data.content)
+        const { data } = await supabase.from('blogs').select().eq('id', id).single()
+        if (data) {
+            setTitle(data.title)
+            setContent(data.content)
+        }
     }
     return(
         <div> 

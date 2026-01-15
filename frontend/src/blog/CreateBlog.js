@@ -1,9 +1,7 @@
-import axios from "axios";
+import { supabase } from '../supabaseClient'
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
-const URI = 'http://localhost:8000/blogs/'
 
 const CompCreateBlog = () => {
 
@@ -13,7 +11,8 @@ const CompCreateBlog = () => {
 
     const store =  async (e) => {
         e.preventDefault()
-       await axios.post(URI, {title: title, content: content})
+        const { data: { user } } = await supabase.auth.getUser()
+        await supabase.from('blogs').insert({title: title, content: content, user_id: user.id})
         navigate('/')
     }
 
